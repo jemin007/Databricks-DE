@@ -71,7 +71,7 @@ final_df = pit_stops_with_ingestion_date_df.withColumnRenamed("driverId", "drive
 
 # COMMAND ----------
 
-final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/pit_stops")
+final_df.write.mode("overwrite").format("parquet").saveAsTable('f1_processed.pit_stops')
 
 # COMMAND ----------
 

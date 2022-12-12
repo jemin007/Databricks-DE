@@ -91,7 +91,12 @@ circuits_final_df = add_ingestion_date(circuits_renamed_df)
 
 # COMMAND ----------
 
-circuits_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/circuits")
+circuits_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.circuits")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select * from f1_processed.circuits
 
 # COMMAND ----------
 

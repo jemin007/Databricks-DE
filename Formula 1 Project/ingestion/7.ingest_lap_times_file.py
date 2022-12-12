@@ -69,7 +69,7 @@ final_df = lap_times_with_ingestion_date_df.withColumnRenamed("driverId", "drive
 
 # COMMAND ----------
 
-final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/lap_times")
+final_df.write.mode("overwrite").format("parquet").saveAsTable('f1_processed.lap_times')
 
 # COMMAND ----------
 

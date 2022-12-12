@@ -78,7 +78,12 @@ races_selected_df = races_with_ingestion_date_df.select(col('raceId').alias('rac
 
 # COMMAND ----------
 
-races_selected_df.write.mode('overwrite').partitionBy('race_year').parquet(f'{processed_folder_path}/races')
+races_selected_df.write.mode('overwrite').partitionBy('race_year').format("parquet").saveAsTable('f1_processed.races')
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select * from f1_processed.races
 
 # COMMAND ----------
 

@@ -75,7 +75,7 @@ final_df = qualifying_with_ingestion_date_df.withColumnRenamed("qualifyId", "qua
 
 # COMMAND ----------
 
-final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/qualifying")
+final_df.write.mode("overwrite").format("parquet").saveAsTable('f1_processed.qualifying')
 
 # COMMAND ----------
 
