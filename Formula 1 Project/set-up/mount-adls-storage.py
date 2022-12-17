@@ -49,6 +49,10 @@ mountadls("presentation")
 
 # COMMAND ----------
 
+mountadls("demo")
+
+# COMMAND ----------
+
 mountadls("raw")
 mountadls("processed")
 
@@ -58,7 +62,7 @@ dbutils.fs.ls("/mnt/f1dlcourse/presentation")
 
 # COMMAND ----------
 
-dbutils.fs.ls("/mnt/f1dlcourse/processed")
+dbutils.fs.ls("/mnt/f1dlcourse/demo")
 
 # COMMAND ----------
 
