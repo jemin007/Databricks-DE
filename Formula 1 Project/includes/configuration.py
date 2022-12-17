@@ -6,3 +6,7 @@ presentation_folder_path ="/mnt/f1dlcourse/presentation"
 # COMMAND ----------
 
 
+
+# COMMAND ----------
+
+
