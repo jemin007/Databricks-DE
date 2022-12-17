@@ -8,11 +8,26 @@
 
 # COMMAND ----------
 
-race_results_df = spark.read.parquet(f"{presentation_folder_path}/race_results")
+# MAGIC %run "../includes/common_functions"
 
 # COMMAND ----------
 
-display(race_results_df)
+dbutils.widgets.text("p_file_date", "2021-03-21")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Finding race years for which data has to be processed
+
+# COMMAND ----------
+
+race_results_df = spark.read.parquet(f"{presentation_folder_path}/race_results") \
+.filter(f"file_date = '{v_file_date}'") 
+
+# COMMAND ----------
+
+race_year_list = df_column_to_list(race_results_df, 'race_year')
 
 # COMMAND ----------
 
@@ -20,13 +35,14 @@ from pyspark.sql.functions import sum, count, col, when
 
 # COMMAND ----------
 
-driver_standings_df = race_results_df \
-.groupBy("race_year", "driver_name", "driver_nationality", "team") \
-.agg(sum("points").alias("total_points"), count(when(col("position") == 1, True)).alias("wins"))
+race_results_df = spark.read.parquet(f"{presentation_folder_path}/race_results") \
+.filter(col("race_year").isin(race_year_list))
 
 # COMMAND ----------
 
-display(driver_standings_df.filter("race_year == 2020"))
+driver_standings_df = race_results_df \
+.groupBy("race_year", "driver_name", "driver_nationality", "team") \
+.agg(sum("points").alias("total_points"), count(when(col("position") == 1, True)).alias("wins"))
 
 # COMMAND ----------
 
@@ -40,16 +56,18 @@ final_df = driver_standings_df.withColumn("rank", rank().over(driver_rank_window
 
 # COMMAND ----------
 
-display(final_df.filter("race_year == 2020"))
 
-# COMMAND ----------
-
-final_df.write.mode("overwrite").format("parquet").saveAsTable('f1_presentation.driver_standings')
+overwrite_partition(final_df,'f1_presentation','driver_standings','race_year')
 
 # COMMAND ----------
 
 # MAGIC %fs
 # MAGIC ls /mnt/f1dlcourse/presentation/
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select * from f1_presentation.driver_standings
 
 # COMMAND ----------
 
