@@ -274,4 +274,123 @@ deltaTablePeople.alias('tgt') \
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC * History and Versioning
+# MAGIC * Time travel - rollback
+# MAGIC * Vaccum
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC desc history f1_demo.drivers_merge
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select * from f1_demo.drivers_merge VERSION as of 2;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select * from f1_demo.drivers_merge timestamp as of '2022-12-17T16:05:10.000+0000';
+
+# COMMAND ----------
+
+#using python
+df = spark.read.format("delta").option("versionAsOf" ,"2").load('/mnt/f1dlcourse/demo/drivers_merge')
+
+# COMMAND ----------
+
+display(df)
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC Vacuum deletes log, history files
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SET spark.databricks.delta.retentionDurationCheck.enabled = false;
+# MAGIC VACUUM f1_demo.drivers_merge RETAIN 0 HOURS
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC delete from f1_demo.drivers_merge where driverId = 1;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select * from f1_demo.drivers_merge version as of 3
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC --Updating data from previous load
+# MAGIC merge into f1_demo.drivers_merge tgt
+# MAGIC using f1_demo.drivers_merge version as of 3 src
+# MAGIC on tgt.driverId = src.driverId
+# MAGIC when not matched then
+# MAGIC insert *
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC desc history f1_demo.drivers_merge
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select * from f1_demo.drivers_merge
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Convert Parquet to Delta
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC create table if not exists f1_demo.Convert_to_delta (
+# MAGIC driverId int,
+# MAGIC dob DATE,
+# MAGIC forename STRING,
+# MAGIC surname STRING,
+# MAGIC createdDate DATE,
+# MAGIC updatedDate DATE
+# MAGIC )
+# MAGIC USING PARQUET
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC insert into f1_demo.Convert_to_delta
+# MAGIC select * from f1_demo.drivers_merge
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC convert to delta f1_demo.Convert_to_delta
+
+# COMMAND ----------
+
+df = spark.table("f1_demo.Convert_to_delta")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Converting DF to delta
+
+# COMMAND ----------
+
+df.write.format("parquet").save('/mnt/f1dlcourse/demo/Convert_to_delta_new')
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC convert to delta parquet.`/mnt/f1dlcourse/demo/Convert_to_delta_new`
+
+# COMMAND ----------
+
 

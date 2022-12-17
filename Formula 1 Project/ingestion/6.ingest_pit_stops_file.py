@@ -90,16 +90,26 @@ display(final_df)
 
 # MAGIC %python
 # MAGIC 
-# MAGIC spark.conf.set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation","true")
+# MAGIC # spark.conf.set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation","true")
 
 # COMMAND ----------
 
-overwrite_partition(final_df, 'f1_processed', 'pit_stops', 'race_id')
+#overwrite_partition(final_df, 'f1_processed', 'pit_stops', 'race_id')
+
+# COMMAND ----------
+
+merge_condition = "tgt.driver_id = src.driver_id AND tgt.stop = src.stop AND tgt.race_id = src.race_id"
+merge_delta_data(final_df, 'f1_processed','pit_stops', processed_folder_path,merge_condition,'race_id')
+
+# COMMAND ----------
+
+# MAGIC  %sql
+# MAGIC --DROP table f1_processed.pit_stops
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC --DROP table f1_processed.pit_stops
+# MAGIC select * from f1_processed.pit_stops
 
 # COMMAND ----------
 

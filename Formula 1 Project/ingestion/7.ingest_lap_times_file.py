@@ -78,11 +78,16 @@ final_df = lap_times_with_ingestion_date_df.withColumnRenamed("driverId", "drive
 
 # MAGIC %python
 # MAGIC 
-# MAGIC spark.conf.set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation","true")
+# MAGIC # spark.conf.set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation","true")
 
 # COMMAND ----------
 
-overwrite_partition(final_df, 'f1_processed', 'lap_times', 'race_id')
+merge_condition = "tgt.driver_id = src.driver_id AND tgt.lap = src.lap AND tgt.race_id = src.race_id"
+merge_delta_data(final_df, 'f1_processed','lap_times', processed_folder_path,merge_condition,'race_id')
+
+# COMMAND ----------
+
+# overwrite_partition(final_df, 'f1_processed', 'lap_times', 'race_id')
 
 # COMMAND ----------
 
